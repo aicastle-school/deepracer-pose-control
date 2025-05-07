@@ -7,6 +7,7 @@
 </head>
 <body>
     <div>Teachable Machine Pose Model</div>
+<img src="https://192.168.1.2/route?topic=/camera_pkg/display_mjpeg&width=480&height=360">
 <button type='button' onclick='init()'>Start</button>
 <div><canvas id='canvas'></canvas></div>
 <div id='label-container'></div>
@@ -23,7 +24,7 @@
     async function init() {
         const modelURL = URL + 'model.json';
         const metadataURL = URL + 'metadata.json';
-
+        
         // load the model and metadata
         // Refer to tmPose.loadFromFiles() in the API to support files from a file picker
         model = await tmPose.load(modelURL, metadataURL);
@@ -64,9 +65,8 @@
                 prediction[i].className + ': ' + prediction[i].probability.toFixed(2);
             labelContainer.childNodes[i].innerHTML = classPrediction;
 
-
-            console.log("루프돌아감")
-
+            // prediction[i].className (직진, 좌회전, 우회전) 
+            // console.log(prediction[i].probability.toFixed(2))
         }
 
         // finally draw the poses
