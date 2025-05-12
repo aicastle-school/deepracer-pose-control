@@ -8,7 +8,7 @@
 </head>
 <body>
     <div>Teachable Machine Pose Model</div>
-<img src="https://192.168.1.2/route?topic=/camera_pkg/display_mjpeg&width=480&height=360">
+<!-- <img src="https://192.168.1.2/route?topic=/camera_pkg/display_mjpeg&width=480&height=360" crossorigin="use-credentials"> -->
 <button type='button' onclick='init()'>Start</button>
 <div><canvas id='canvas'></canvas></div>
 <div id='label-container'></div>
@@ -54,6 +54,8 @@
         window.requestAnimationFrame(loop);
     }
 
+    let lastLogTime = 0; // 마지막으로 로그를 찍은 시간 기록
+
     async function predict() {
         // Prediction #1: run input through posenet
         // estimatePose can take in an image, video or canvas html element
@@ -61,14 +63,110 @@
         // Prediction 2: run input through teachable machine classification model
         const prediction = await model.predict(posenetOutput);
 
-        for (let i = 0; i < maxPredictions; i++) {
-            const classPrediction =
-                prediction[i].className + ': ' + prediction[i].probability.toFixed(2);
-            labelContainer.childNodes[i].innerHTML = classPrediction;
+        // 동작별 확률을 객체로 저장
+        const predictionMap = {};
 
-            // prediction[i].className (직진, 좌회전, 우회전) 
-            // console.log(prediction[i].probability.toFixed(2))
+        // for (let i = 0; i < maxPredictions; i++) {
+        //     const classPrediction =
+        //         prediction[i].className + ': ' + prediction[i].probability.toFixed(2);
+        //     labelContainer.childNodes[i].innerHTML = classPrediction;
+
+        //     // prediction[i].className (직진, 좌회전, 우회전) 
+        //     // console.log(prediction[i].probability.toFixed(2))
+        // }
+
+
+        const now = Date.now();
+
+
+        const poseToDriveCommand = {
+            "빠른 직진":    { angle: 0.0, speed: 1.0 },
+            "느린 직진":    { angle: 0.0, speed: 0.5 },
+            "빠른 좌회전":  { angle: -1.0, speed: 1.0 },
+            "느린 좌회전":  { angle: -1.0, speed: 0.5 },
+            "빠른 우회전":  { angle: 1.0, speed: 1.0 },
+            "느린 우회전":  { angle: 1.0, speed: 0.5 }
+        };
+
+        if(now - lastLogTime > 10000) {
+
+        // 가장 확률 높은 클래스 선택
+        const top = prediction.reduce((prev, current) => (
+            prev.probability > current.probability ? prev : current
+        ));
+
+           if (top.probability >= 0.8 && poseToDriveCommand[top.className]) {
+            const { angle, speed } = poseToDriveCommand[top.className];
+
+            const data = {
+                angle: -Math.max(-1, Math.min(1, angle)),
+                throttle: -Math.max(-1, Math.min(1, speed)),
+                max_speed: speed
+            };
+
+            console.log("보내는 데이터:", JSON.stringify(data));
+
+            fetch('https://192.168.1.2/api/manual_drive', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(data)
+            })
+            .then(res => res.text())  // 응답이 JSON 아닐 수도 있어
+            .then(text => {
+            console.log("✅ 서버 응답 본문:", text);
+            })
+            .catch(err => console.error("❌ 오류:", err));
+        }    
+
+        for (let i = 0; i < maxPredictions; i++) {
+                const label = prediction[i].className;
+                const prob = prediction[i].probability;
+                predictionMap[label] = prob;
+
+                // UI 표시
+                const classPrediction = label + ': ' + prob.toFixed(2);
+                labelContainer.childNodes[i].innerHTML = classPrediction;
+
+                // console.log("🔍 예측 결과:", predictionMap);
+
+                // 예: 확률이 0.8 이상일 때만 동작 처리
+                if (prob >= 0.5) {
+                    switch (label) {
+                        case "빠른 직진":
+                            console.log("🚀 빠른 직진 감지:", prob.toFixed(2));
+                            // 동작 처리 코드
+                            break;
+                        case "느린 직진":
+                            console.log("🚶 느린 직진 감지:", prob.toFixed(2));
+                            break;
+
+                        case "빠른 좌회전":
+                            console.log("↪️ 빠른 좌회전 감지:", prob.toFixed(2));
+                            break;
+
+                        case "느린 좌회전":
+                            console.log("↩️ 느린 좌회전 감지:", prob.toFixed(2));
+                            break;
+
+                        case "빠른 우회전":
+                            console.log("➡️ 빠른 우회전 감지:", prob.toFixed(2));
+                            break;
+
+                        case "느린 우회전":
+                            console.log("⬅️ 느린 우회전 감지:", prob.toFixed(2));
+                            break;
+
+                        default:
+                            console.log("🤷 알 수 없는 동작:", label, prob.toFixed(2));
+                    }
+                }
+            }
+
+               lastLogTime = now; // 마지막 로그 시간 갱신
         }
+
+        
 
         // finally draw the poses
         drawPose(pose);
@@ -84,30 +182,30 @@
         }
     }
 
+    // const url = 'https://192.168.1.2/route?topic=/camera_pkg/display_mjpeg&width=480&height=360' 
+    //     fetch(url, {
+    //         method: 'GET',
+    //         credentials: 'include',
+    //             // headers: {
+    //             //     // 'Authorization': 'Bearer YOUR_TOKEN',
+    //             //     // 또는 테스트용 쿠키를 강제로 추가해볼 수도 있음 (일시적 디버깅 용도)
+    //             //     'Cookie': 'session_id=abc123'
+    //             // }
+    //     }).then(response => {
 
-    const url = 'https://192.168.1.2/route?topic=/camera_pkg/display_mjpeg&width=480&height=360' 
-        fetch(url, {
-            method: 'GET',
-            credentials: 'include'
-        }).then(response => {
-
-            console.log("스테이터스 확인")
-            console.log(response.status)
-            if (response.ok) {
-
-                console.log("성공")
-
-                console.log('Stream started successfully');
-            } else {
-                console.error('Error starting stream:', response.statusText);
-
-                console.log("에러")
-            }
-        }).catch(error => {
-            console.error('Error:', error);
-
-            console.log("에러")
-        });
+    //         console.log("스테이터스 확인")
+    //         console.log(response.status)
+    //         if (response.ok) {
+    //             console.log("성공")
+    //             console.log('Stream started successfully');
+    //         } else {
+    //             console.error('Error starting stream:', response.statusText);
+    //             console.log("에러111")
+    //         }
+    //     }).catch(error => {
+    //         console.log("에러222")
+    //         console.error('Error:', error);
+    //     });
 
 </script>
 </body>
