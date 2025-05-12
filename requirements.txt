@@ -1,2 +1,2 @@
-aicastle
+aicastle[deepracer-vehicle]==0.7.37
 flask

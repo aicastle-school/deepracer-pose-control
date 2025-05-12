@@ -12,6 +12,9 @@
     <img id="cameraStream" width="480" height="360"/>
   </div>
 
+  <h1>Send PUT Request</h1>
+  <button id="sendRequest">Send PUT Request</button>
+
   <script>
     function loadStream(){
       const ip = document.getElementById('ip').value;
@@ -21,6 +24,30 @@
       img.crossOrigin = "use-credentials"; // 반드시 추가 (쿠키 자동 전달)
       img.src = url;
     }
+
+    document.getElementById("sendRequest").addEventListener("click", () => {
+      const data = {
+        key1: "value1",
+        key2: "value2"
+      };
+
+      fetch("/update-data", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(result => {
+        console.log("Success:", result);
+        alert("Response: " + JSON.stringify(result));
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("Error: " + error);
+      });
+    });
   </script>
 </body>
 </html>
