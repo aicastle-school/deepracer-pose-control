@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Angle & Speed Arrow</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    label { margin-right: 10px; }
+    #canvas { border:1px solid #ccc; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <label>
+    Angle (-30~30°): 
+    <input id="angle" type="number" min="-30" max="30" value="0">
+  </label>
+
+  <label>
+    Speed (2~4): 
+    <input id="speed" type="number" min="2" max="4" step="0.1" value="4">
+  </label>
+
+  <button id="drawBtn">Draw Arrow</button>
+
+  <canvas id="canvas" width="300" height="300"></canvas>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx    = canvas.getContext('2d');
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    function drawArrow(angleDeg, speed) {
+      // 1) 파라미터 clamp
+      angleDeg = Math.max(-30, Math.min(30, angleDeg));
+      speed    = Math.max(2,  Math.min(4,  speed));
+
+      // 2) 길이 계산 (speed * 30px)
+      const length = speed * 30;
+      const headLen = 10;       // 화살머리 길이
+      const headAngle = 20 * Math.PI / 180;  // 화살머리 각도(20°)
+
+      // 3) 캔버스 초기화
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 4) 변환
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(-angleDeg * Math.PI / 180); // +angle = 좌(반시계), -angle = 우(시계)
+
+      // 5) 몸통 그리기
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, -length);
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#333';
+      ctx.stroke();
+
+      // 6) 화살머리 그리기
+      const x0 = 0, y0 = -length;
+      // 왼쪽 머리
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(
+        x0 + Math.sin(headAngle) * headLen,
+        y0 + Math.cos(headAngle) * headLen
+      );
+      ctx.stroke();
+      // 오른쪽 머리
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(
+        x0 - Math.sin(headAngle) * headLen,
+        y0 + Math.cos(headAngle) * headLen
+      );
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    document.getElementById('drawBtn').addEventListener('click', () => {
+      const angle = parseFloat(document.getElementById('angle').value);
+      const speed = parseFloat(document.getElementById('speed').value);
+      drawArrow(angle, speed);
+    });
+
+    // 초기 한 번 그려두기
+    drawArrow(0, 4);
+  </script>
+</body>
+</html>
