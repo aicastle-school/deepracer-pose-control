@@ -13,3 +13,20 @@
     ```bash
     pip install -r requirements.txt
     ```
+
+## Run
+
+- common
+    ```bash
+    python run.py
+    ```
+
+- Linux
+    ```bash
+    gunicorn --certfile=cert.pem --keyfile=key.pem --bind 0.0.0.0:5000 --worker-class=gevent --threads 4 run:app
+    ```
+
+- Window
+    ```bash
+    waitress-serve --host=0.0.0.0 --port=5000 run:app
+    ```
