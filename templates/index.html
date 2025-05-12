@@ -22,9 +22,7 @@
     height: 20px;
     border-radius: 4px;
     }
-    .progress-text {
-    font-size: 0.9rem;
-    }
+    
 
     /* body {
       background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)),
@@ -40,9 +38,53 @@
       border-radius: 10px;
     } */
 
-    .progress-bar {
-        transition: width 0.3s ease-in-out;
+    /* 속도조절 바 관련 UI 스타일 */
+
+    .speed-control-card {
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 20px;
+        width: 100%;
+        max-width: 300px;
+        margin: auto;
     }
+
+    .speed-label {
+        font-weight: 600;
+        margin-bottom: 5px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .form-range::-webkit-slider-thumb {
+        background: #0d6efd;
+    }
+
+    .btn-apply {
+        width: 100%;
+        border-radius: 8px;
+        font-weight: bold;
+        background-color: #0d6efd;
+        color: white;
+        transition: all 0.2s ease;
+    }
+
+    .btn-apply:hover {
+        background-color: #0b5ed7;
+    }
+
+    /* 부드러운 테두리와 그림자 스타일 */
+    .speed-control-box {
+        min-width: 220px;
+        max-width: 100%;
+        border-radius: 12px;
+    }
+
+
+
+
+
     
   </style>
 
@@ -62,96 +104,44 @@
             <h6 class="mt-3">차량 조종 결과</h6>
             <div class="controller-result text-left">
 
-                
-              <!-- <div class="mb-2">
-                <span class="text-warning font-weight-bold">직진</span>
-                <div class="progress">
-                  <div class="progress-bar bg-warning" style="width: 20%"></div>
-                </div>
-              </div>
-              <div class="mb-2">
-                <span class="text-danger font-weight-bold">좌회전</span>
-                <div class="progress">
-                  <div class="progress-bar bg-danger" style="width: 100%">100%</div>
-                </div>
-              </div>
-              <div class="mb-2">
-                <span class="text-primary font-weight-bold">우회전</span>
-                <div class="progress">
-                  <div class="progress-bar bg-primary" style="width: 0%"></div>
-                </div>
-              </div> -->
-
-              
-                <div class="mb-2">
-                    <span class="text-warning font-weight-bold">빠른 직진</span>
-                    <div class="progress">
-                        <div id="progress-fast-straight" class="progress-bar bg-warning" style="width: 0%"></div>
-                    </div>
-                    </div>
-
-                    <div class="mb-2">
-                    <span class="text-warning font-weight-bold">느린 직진</span>
-                    <div class="progress">
-                        <div id="progress-slow-straight" class="progress-bar bg-warning" style="width: 0%"></div>
-                    </div>
-                    </div>
-
-                    <div class="mb-2">
-                    <span class="text-danger font-weight-bold">빠른 좌회전</span>
-                    <div class="progress">
-                        <div id="progress-fast-left" class="progress-bar bg-danger" style="width: 0%"></div>
-                    </div>
-                    </div>
-
-                    <div class="mb-2">
-                    <span class="text-danger font-weight-bold">느린 좌회전</span>
-                    <div class="progress">
-                        <div id="progress-slow-left" class="progress-bar bg-danger" style="width: 0%"></div>
-                    </div>
-                    </div>
-
-                    <div class="mb-2">
-                    <span class="text-primary font-weight-bold">빠른 우회전</span>
-                    <div class="progress">
-                        <div id="progress-fast-right" class="progress-bar bg-primary" style="width: 0%"></div>
-                    </div>
-                    </div>
-
-                    <div class="mb-2">
-                    <span class="text-primary font-weight-bold">느린 우회전</span>
-                    <div class="progress">
-                        <div id="progress-slow-right" class="progress-bar bg-primary" style="width: 0%"></div>
-                    </div>
-                </div>
-
+            <!-- Chart.js Canvas -->
+            <!-- 자동차 조종 결과 -->
+            <canvas id="predictionChart" height="300"></canvas>  
             </div>
           </div>
         </div>
       </div>
 
       <!-- 오른쪽 카드 -->
-      <div class="col-md-8">
-        <div class="card shadow-sm">
-          <div class="card-body text-center">
+      <!-- 오른쪽 col-md-8 내에 카드 2개 정렬 -->
+        <div class="col-md-8">
+        <!-- 차량 전면 카메라 카드 -->
+        <div class="card shadow-sm mb-2">
+            <div class="card-body text-center py-4"> <!-- py-4로 위아래 여백 대칭 -->
             <h4 class="font-weight-bold mb-3">차량 전면 카메라</h4>
-            <img src="your_front_camera_view.jpg" alt="차량 전면 화면" class="img-fluid rounded">
-          </div>
+            <img src="http://localhost:5000/video" alt="차량 전면 화면" class="img-fluid rounded">
+            </div>
         </div>
-      </div>
 
+        <!-- 스피드 조절 카드 -->
+        <div class="card shadow-sm col-md-4">
+            <div class="card-body py-3"> <!-- py-3로 위아래 여백 조금만 줌 -->
+            <div class="d-flex justify-content-between mb-2">
+                <strong>스피드 조절</strong>
+                <span id="speedValue">50%</span>
+            </div>
+            <input type="range" class="form-range" min="1" max="100" value="50" id="speedRange">
+            <button id="applySpeed" class="btn btn-primary w-100 mt-3 fw-bold">
+                🚀 설정
+            </button>
+            </div>
+        </div>
+        </div>
     </div>
   </div>
 
-
-
-    <div>Teachable Machine Pose Model</div>
-
-
-<!-- <img src="https://192.168.1.2/route?topic=/camera_pkg/display_mjpeg&width=480&height=360" crossorigin="use-credentials"> -->
-<button type='button' onclick='init()'>Start</button>
-
-
+<!-- <div>Teachable Machine Pose Model</div> -->
+<!-- <button type='button' onclick='init()'>Start</button> -->
 
 
 <div id='label-container'></div>
@@ -164,8 +154,42 @@
     // the link to your model provided by Teachable Machine export panel
     const URL = './';
     let model, webcam, ctx, labelContainer, maxPredictions;
+    let predictionChart;
 
-    async function init() {
+    
+    const speedSlider = document.getElementById('speedRange');
+    const speedValueLabel = document.getElementById('speedValue');
+    const applyBtn = document.getElementById('applySpeed');
+
+    // 실시간으로 값 표시
+    speedSlider.addEventListener('input', () => {
+      speedValueLabel.textContent = speedSlider.value + '%';
+    });
+
+    // 버튼 클릭 시 이벤트 발생
+    applyBtn.addEventListener('click', () => {
+    const speed = parseInt(speedSlider.value);
+    console.log("선택된 속도:", speed);
+
+        fetch('/speed_percent', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ speed_percent: speed })
+        })
+        .then(res => res.text())
+        .then(text => console.log("✅ 서버 응답:", text))
+        .catch(err => console.error("❌ 오류:", err));
+    });
+
+
+    //바로 시작
+    init();
+   
+     async function init() {
+
+        //최초 스피드 조절50% 로 1회 자동클릭
+        applyBtn.click(); 
+
         const modelURL = URL + '/model.json';
         const metadataURL = URL + '/metadata.json';
         
@@ -179,6 +203,7 @@
         webcam = new tmPose.Webcam(200, 200, flip); // width, height, flip
         await webcam.setup(); // request access to the webcam
         webcam.play();
+        initCharts(); // 차트 초기화
         window.requestAnimationFrame(loop);
 
         // append/get elements to the DOM
@@ -189,6 +214,8 @@
         for (let i = 0; i < maxPredictions; i++) { // and class labels
             labelContainer.appendChild(document.createElement('div'));
         }
+
+
     }
 
     async function loop(timestamp) {
@@ -209,47 +236,68 @@
         // 동작별 확률을 객체로 저장
         const predictionMap = {};
 
-        // for (let i = 0; i < maxPredictions; i++) {
-        //     const classPrediction =
-        //         prediction[i].className + ': ' + prediction[i].probability.toFixed(2);
-        //     labelContainer.childNodes[i].innerHTML = classPrediction;
-
-        //     // prediction[i].className (직진, 좌회전, 우회전) 
-        //     // console.log(prediction[i].probability.toFixed(2))
-        // }
-
-
         const now = Date.now();
 
-
+        //여기서 앵글값  
         const poseToDriveCommand = {
-            "빠른 직진":    { angle: 0.0, speed: 1.0 },
-            "느린 직진":    { angle: 0.0, speed: 0.5 },
-            "빠른 좌회전":  { angle: -1.0, speed: 1.0 },
-            "느린 좌회전":  { angle: -1.0, speed: 0.5 },
-            "빠른 우회전":  { angle: 1.0, speed: 1.0 },
-            "느린 우회전":  { angle: 1.0, speed: 0.5 }
+            "NONE":         { angle: 0.0, speed: 0.0 },  // 정지            0.3 
+            "Fast-Forward": { angle: 0.0, speed: 4.0 },  // 빠른 직진        0.1
+            "Slow-Forward": { angle: 0.0, speed: 2.0 },  // 느린 직진        0.2
+            "Fast-Left":    { angle: 30, speed: 4.0 },   // 빠른 좌회전      0.1
+            "Slow-Left":    { angle: 30, speed: 2.0 },   // 느린 좌회전      0.3
+            "Fast-Right":   { angle: -30, speed: 4.0 },  // 빠른 우회전      0
+            "Slow-Right":   { angle: -30, speed: 2.0 }   // 느린 우회전      0
         };
 
-        if(now - lastLogTime > 1000) {
+        // 특정 초 마다 서버에 데이터전송. 10 당 0.1초
+        if(now - lastLogTime > 10000) {
 
-        // 가장 확률 높은 클래스 선택
-        const top = prediction.reduce((prev, current) => (
-            prev.probability > current.probability ? prev : current
-        ));
+            // 가장 확률 높은 클래스 선택
+            const top = prediction.reduce((prev, current) => (
+                prev.probability > current.probability ? prev : current
+            ));
 
-           if (top.probability >= 0.8 && poseToDriveCommand[top.className]) {
+           console.log("확률")
+           console.log(top.probability)
+            
+        
+        for (let i = 0; i < maxPredictions; i++) {
+                const label = prediction[i].className;
+                const prob = prediction[i].probability;
+                predictionMap[label] = prob;
+                // UI 표시
+                const classPrediction = label + ': ' + prob.toFixed(2);
+                labelContainer.childNodes[i].innerHTML = classPrediction;
+
+                // console.log("🔍 예측 결과:", predictionMap);
+                console.log(`📌 ${label}: ${prob.toFixed(4)}`);
+                console.log(label)
+                
+            }
+            // 서버에 데이터 전송
+            lastLogTime = now; // 마지막 로그 시간 갱신
+                
+            //라벨 값
+            const label = top.className;
+
+            //none 일때 움직이는 데이터 전송x
             const { angle, speed } = poseToDriveCommand[top.className];
 
+            // 여기 추가! ✅
+            console.log("🚘 선택된 동작 라벨:", label);
+            console.log("➡️ 계산된 angle 값:", angle);
+            console.log("💨 계산된 speed 값:", speed);    
+
+
+            //실제 보내는 데이터 
             const data = {
                 angle: -Math.max(-1, Math.min(1, angle)),
-                throttle: -Math.max(-1, Math.min(1, speed)),
-                max_speed: speed
+                speed: speed  
             };
-
+            
             console.log("보내는 데이터:", JSON.stringify(data));
 
-            fetch('https://192.168.1.2/api/manual_drive', {
+            fetch('/move', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -260,124 +308,85 @@
             console.log("✅ 서버 응답 본문:", text);
             })
             .catch(err => console.error("❌ 오류:", err));
-        }    
 
-        for (let i = 0; i < maxPredictions; i++) {
-                const label = prediction[i].className;
-                const prob = prediction[i].probability;
-                predictionMap[label] = prob;
 
-                // UI 표시
-                const classPrediction = label + ': ' + prob.toFixed(2);
-                labelContainer.childNodes[i].innerHTML = classPrediction;
-
-                // console.log("🔍 예측 결과:", predictionMap);
-
-                // 예: 확률이 0.8 이상일 때만 동작 처리
-                if (prob >= 0.5) {
-                    switch (label) {
-                        case "빠른 직진":
-                            console.log("🚀 빠른 직진 감지:", prob.toFixed(2));
-                            // 동작 처리 코드
-                            break;
-                        case "느린 직진":
-                            console.log("🚶 느린 직진 감지:", prob.toFixed(2));
-                            break;
-
-                        case "빠른 좌회전":
-                            console.log("↪️ 빠른 좌회전 감지:", prob.toFixed(2));
-                            break;
-
-                        case "느린 좌회전":
-                            console.log("↩️ 느린 좌회전 감지:", prob.toFixed(2));
-                            break;
-
-                        case "빠른 우회전":
-                            console.log("➡️ 빠른 우회전 감지:", prob.toFixed(2));
-                            break;
-
-                        case "느린 우회전":
-                            console.log("⬅️ 느린 우회전 감지:", prob.toFixed(2));
-                            break;
-
-                        default:
-                            console.log("🤷 알 수 없는 동작:", label, prob.toFixed(2));
-                    }
-                }
-            }
-
-               lastLogTime = now; // 마지막 로그 시간 갱신
+            // 프로그래스 바 
+            updateProgressBars(predictionMap);
         }
-
-        updateProgressBars(predictionMap);
-
         // finally draw the poses
         drawPose(pose);
-
-        console.log("🔍 예측값 확인:", predictionMap);
-
+        // console.log("🔍 예측값 확인:", predictionMap);
     }
 
+    // draw the poses on the canvas
     function drawPose(pose) {
-        ctx.drawImage(webcam.canvas, 0, 0);
-        // draw the keypoints and skeleton
-        if (pose) {
-            const minPartConfidence = 0.5;
-            tmPose.drawKeypoints(pose.keypoints, minPartConfidence, ctx);
-            tmPose.drawSkeleton(pose.keypoints, minPartConfidence, ctx);
-        }
+      ctx.drawImage(webcam.canvas, 0, 0);
+      if (pose) {
+        const minPartConfidence = 0.5;
+        tmPose.drawKeypoints(pose.keypoints, minPartConfidence, ctx);
+        tmPose.drawSkeleton(pose.keypoints, minPartConfidence, ctx);
+      }
     }
 
-    // 실시간 프로그레스바 업데이트
-    function updateProgressBars(predictionMap) {
-        const mapping = {
-            "빠른 직진": "progress-fast-straight",
-            "느린 직진": "progress-slow-straight",
-            "빠른 좌회전": "progress-fast-left",
-            "느린 좌회전": "progress-slow-left",
-            "빠른 우회전": "progress-fast-right",
-            "느린 우회전": "progress-slow-right"
-        };
-
-        for (const [label, id] of Object.entries(mapping)) {
-            const value = predictionMap[label] || 0;
-            const percent = Math.round(value * 100);
-
-            console.log("퍼센트확인")
-            console.log(percent)
-
-            const bar = document.getElementById(id);
-            if (bar) {
-            bar.style.width = `${percent}%`;
-            bar.innerText = percent > 15 ? `${percent}%` : ""; // 너무 좁으면 텍스트 생략
+    //차트 초기화
+    function initCharts() {
+        const ctx = document.getElementById('predictionChart').getContext('2d');
+        predictionChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+            labels: [  "NONE", "Fast-Forward", "Slow-Forward", "Fast-Left", "Slow-Left", "Fast-Right", "Slow-Right"],
+            datasets: [{
+                label: '예측 확률 (%)',
+                data: [0, 0, 0, 0, 0, 0],
+                backgroundColor: [
+                '#6c757d', // NONE (회색)
+                '#ffc107', '#ffc107', // 노랑
+                '#dc3545', '#dc3545', // 빨강
+                '#007bff', '#007bff'  // 파랑
+                ],
+                borderRadius: 8,        // 모서리 둥글게
+                barThickness: 20,       // 막대 두께
+            }]
+            },
+            options: {
+            indexAxis: 'y',           // ✅ 수평 막대 그래프로 변경
+            responsive: true,
+            animation: { duration: 200 },
+            scales: {
+                x: {
+                min: 0,
+                max: 100,
+                ticks: {
+                    callback: value => value + '%'
+                },
+                grid: {
+                    display: false
+                }
+                },
+                y: {
+                grid: {
+                    display: false
+                }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                callbacks: {
+                    label: ctx => `${ctx.label}: ${ctx.raw}%`
+                }
+                }
             }
-        }
+            }
+        });
     }
 
-    // const url = 'https://192.168.1.2/route?topic=/camera_pkg/display_mjpeg&width=480&height=360' 
-    //     fetch(url, {
-    //         method: 'GET',
-    //         credentials: 'include',
-    //             // headers: {
-    //             //     // 'Authorization': 'Bearer YOUR_TOKEN',
-    //             //     // 또는 테스트용 쿠키를 강제로 추가해볼 수도 있음 (일시적 디버깅 용도)
-    //             //     'Cookie': 'session_id=abc123'
-    //             // }
-    //     }).then(response => {
-
-    //         console.log("스테이터스 확인")
-    //         console.log(response.status)
-    //         if (response.ok) {
-    //             console.log("성공")
-    //             console.log('Stream started successfully');
-    //         } else {
-    //             console.error('Error starting stream:', response.statusText);
-    //             console.log("에러111")
-    //         }
-    //     }).catch(error => {
-    //         console.log("에러222")
-    //         console.error('Error:', error);
-    //     });
+    function updateProgressBars(predictionMap) {
+      const labels = ["NONE", "Fast-Forward", "Slow-Forward", "Fast-Left", "Slow-Left", "Fast-Right", "Slow-Right"];
+      const updatedData = labels.map(label => Math.round((predictionMap[label] || 0) * 100));
+      predictionChart.data.datasets[0].data = updatedData;
+      predictionChart.update();
+    }
 
 </script>
 </body>

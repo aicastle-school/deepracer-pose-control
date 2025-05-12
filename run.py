@@ -62,7 +62,7 @@ def video_stream():
 def set_speed_percent():
     if not (data := request.get_json(silent=True)):
         return {"error": "No JSON data provided"}, 400
-
+    print(data)
     speed_percent = int(data.get("speed_percent"))
     vehicle.set_speed_percent(speed_percent)
     return {"message": "Speed updated successfully", "speed_percent": speed_percent}, 200
@@ -72,6 +72,7 @@ def set_speed_percent():
 def move():
     if not (data := request.get_json(silent=True)):
         return {"error": "No JSON data provided"}, 400
+    print(data)
     vehicle.move(
         angle=float(data.get("angle")), 
         speed=float(data.get("speed"))
@@ -81,6 +82,7 @@ def move():
 @app.put("/stop")
 def stop():
     vehicle.stop()
+    print("stop")
     return {"message": "Vehicle stopped successfully"}, 200
 
 ######### run ###########
