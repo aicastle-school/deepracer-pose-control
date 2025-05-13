@@ -24,9 +24,6 @@ from aicastle.deepracer.vehicle.api.client import VehicleClient
 vehicle =VehicleClient(
     ip=os.getenv("VEHICLE_IP"),
     password=os.getenv("VEHICLE_PASSWORD"),
-    ssh_module_update=True,
-    ssh_module_update_custom=True,
-    ssh_password=os.getenv("SSH_PASSWORD"),
     width=os.getenv("IMAGE_WIDTH", 480),
     height=os.getenv("IMAGE_HEIGHT", 360),
 )
@@ -87,11 +84,17 @@ def stop():
 
 ######### run ###########
 if __name__ == "__main__":
-    app.config["TEMPLATES_AUTO_RELOAD"] = True
+    app.config.update(
+        TEMPLATES_AUTO_RELOAD=True,
+        SESSION_COOKIE_SAMESITE="None",  # None으로 설정하여 서드파티 쿠키 허용
+        SESSION_COOKIE_SECURE=True      # HTTPS에서만 쿠키 전송
+    )
     app.run(
         host="0.0.0.0", 
         port=os.getenv("PORT", 5000), 
         use_reloader=True,
         use_debugger=False,
         # debug=True,
+        # ssl_context='adhoc',
+        # ssl_context=("cert.pem", "key.pem"),
     )

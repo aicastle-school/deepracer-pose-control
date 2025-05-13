@@ -30,3 +30,9 @@
     ```bash
     waitress-serve --host=0.0.0.0 --port=5000 run:app
     ```
+
+## Etc
+    - 인증서 생성
+    ```bash
+    openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 36500 -nodes
+    ```
