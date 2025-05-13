@@ -64,3 +64,81 @@ border-radius: 4px;
     max-width: 100%;
     border-radius: 12px;
 }
+
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin-top: 12px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0;
+    right: 0; bottom: 0;
+    background-color: #dc3545; /* Bootstrap danger */
+    transition: .4s;
+    border-radius: 34px;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "🛑";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 26px;
+    font-size: 16px;
+  }
+
+  input:checked + .slider {
+    background-color: #28a745; /* Bootstrap success */
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(26px);
+    content: "✅";
+  }
+
+  .switch-label {
+    font-weight: bold;
+    margin-top: 10px;
+  }
+
+
+  /* Smooth 전용 스타일 */
+  #smoothToggle + .slider {
+    background-color: #adb5bd; /* 회색 */
+  }
+
+  #smoothToggle:checked + .slider {
+    background-color: #0d6efd; /* 부트스트랩 primary 파랑 */
+  }
+
+  #smoothToggle + .slider:before {
+    content: "🌫️";
+  }
+
+  #smoothToggle:checked + .slider:before {
+    content: "🌊";
+    transform: translateX(26px);
+  }
+
+  .switch-label {
+    font-weight: bold;
+    margin-top: 10px;
+  }

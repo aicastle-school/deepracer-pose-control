@@ -5,7 +5,7 @@
 const URL = "./";
 let model, webcam, ctx, labelContainer, maxPredictions;
 let predictionChart;
-let apiInterval = 100; // API 호출 간격 (ms)
+let apiInterval = 10000; // API 호출 간격 (ms)
 let lastLogTime = 0; // 마지막으로 로그를 찍은 시간 기록
 const poseToDriveCommand = {
   NONE: { angle: 0.0, speed: 0.0 }, // 정지            0.3
@@ -110,11 +110,13 @@ async function predict() {
     console.log(`meanSpeed: ${meanSpeed}`);
 
     //////// Move ////////
-    const smoothModeCheckbox = document.getElementById("smoothMode");
+    const smoothModeCheckbox = document.getElementById("smoothToggle");
+    
+    //check 값 확인
     const useMean = smoothModeCheckbox.checked;
-    const data = useMean
-      ? { angle: meanAngle, speed: meanSpeed }
-      : { angle: topAngle, speed: topSpeed };
+    console.log("스무스 true/false 확인 " + useMean)
+
+    const data = useMean ? { angle: meanAngle, speed: meanSpeed } : { angle: topAngle, speed: topSpeed };
     console.log("🚀 Sending data in mode:", useMean ? "Smooth (Mean)" : "Top");
     console.log("Data:", data);
 
@@ -226,16 +228,23 @@ function updateProgressBars(predictionMap) {
 }
 
 // Add event listener for the Stop button
-const stopButton = document.getElementById("stopButton");
-stopButton.addEventListener("click", () => {
-  fetch("/stop", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-  })
+const stopToggle = document.getElementById("stopToggle");
+
+stopToggle.addEventListener("change", () => {
+  const isChecked = stopToggle.checked;
+  //console.log(isChecked)
+
+  //트루일때
+  if(isChecked){
+    fetch("/stop", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    })
     .then((res) => res.text())
     .then((text) => {
       console.log("✅ Stop command sent successfully:", text);
     })
     .catch((err) => console.error("❌ Error sending stop command:", err));
+  }
 });
