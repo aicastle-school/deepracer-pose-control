@@ -5,19 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Document</title>
-
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-    />
+    <link rel="stylesheet"  href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
     <link rel="stylesheet" href="assets/main.css" />
+
   </head>
   <body class="bg-light">
-    <div class="container mt-5">
-      <div class="row">
+    <div class="container-fluid px-4 mt-4">
+      <div class="row align-items-stretch">
         <!-- 왼쪽 카드 -->
-        <div class="col-md-4">
-          <div class="card shadow-sm">
+        <div class="col-md-3">
+          <div class="card shadow-sm h-100">
             <div class="card-body text-center">
               <h5 class="card-title font-weight-bold">
                 몸동작으로 차량을 운전!
@@ -36,86 +33,81 @@
 
         <!-- 오른쪽 카드 -->
         <!-- 오른쪽 col-md-8 내에 카드 2개 정렬 -->
-        <div class="col-md-8">
+        <div class="col-md-9">
           <!-- 차량 전면 카메라 카드 -->
           <div class="card shadow-sm mb-2">
-            <div class="card-body text-center py-4">
+            <div class="card-body text-center py-4 position-relative">
               <!-- py-4로 위아래 여백 대칭 -->
               <h4 class="font-weight-bold mb-3">차량 전면 카메라</h4>
-              <img
-                src="http://localhost:5000/video"
-                alt="차량 전면 화면"
-                class="img-fluid rounded"
-              />
+              <img src="/video" alt="차량 전면 화면" class="img-fluid rounded d-block mx-auto" style="width:70%; aspect-ratio:4/3; object-fit:cover;"/>
+
+                  <!-- 계기판  wrapper-->
+                  <div class="position-absolute" style="left:50%; transform:translateX(-50%); bottom:10px;">
+                  <!-- 계기판  canvas-->
+                  <canvas id="arrowCanvas" width="2000" height="700" style="background:transparent;"></canvas>
+                </div>
+            </div>
+
+            <div class="card-body" style="padding:0;">
+                <div class="d-flex justify-content-around align-items-center p-3 border rounded bg-light">
+                  <!-- Speed 정보 -->
+                  <div class="text-center">
+                    <div class="text-muted small">Speed</div>
+                    <div id="currentSpeed" class="h5 font-weight-bold text-primary">0</div>
+                  </div>
+
+                  <!-- Angle 정보 -->
+                  <div class="text-center">
+                    <div class="text-muted small">Angle</div>
+                    <div id="currentAngle" class="h5 font-weight-bold text-success">0</div>
+                  </div>
+                </div>
             </div>
           </div>
           
-          <div class="row gx-3">
-            <!-- 스피드 조절 카드 -->
-            <div class="card shadow-sm col-md-4">
-              <div class="card-body py-3">
-                <!-- py-3로 위아래 여백 조금만 줌 -->
-                <div class="d-flex justify-content-between mb-2">
-                  <strong>스피드 조절</strong>
-                  <span id="speedValue">50%</span>
+          <div class="row g-0 mt-3">
+            <!-- ─── 스피드 조절 ─── -->
+            <div class="col-md-4">
+              <div class="card shadow-sm h-100">
+                <div class="card-body py-3">
+                  <div class="d-flex justify-content-between mb-2">
+                    <strong>스피드 조절</strong>
+                    <span id="speedValue">50%</span>
+                  </div>
+                  <input type="range" class="form-range" min="1" max="100" value="50" id="speedRange">
                 </div>
-                <input
-                  type="range"
-                  class="form-range"
-                  min="1"
-                  max="100"
-                  value="50"
-                  id="speedRange"
-                />
-                <!-- <button id="stopButton" class="btn btn-danger w-100 mt-3 fw-bold">🛑 Stop</button> -->
-                <!-- <div class="text-center">
+              </div>
+            </div>
+
+            <!-- ─── Stop ─── -->
+            <div class="col-md-4">
+              <div class="card shadow-sm h-100">
+                <div class="card-body text-center py-4">
                   <label class="switch">
                     <input type="checkbox" id="stopToggle">
                     <span class="slider"></span>
                   </label>
                   <div class="switch-label">Stop</div>
-                </div>   -->
+                </div>
               </div>
             </div>
 
-            <!-- Stop 카드 -->
-            <div class="card shadow-sm col-md-4">
-              <div class="card-body text-center py-4">
-                <label class="switch">
-                  <input type="checkbox" id="stopToggle">
-                  <span class="slider"></span>
-                </label>
-                <div class="switch-label">Stop</div>
-              </div>
-            </div>
-
-            <div class="card shadow-sm col-md-4">
-              <div class="card-body text-center py-4">
-                <label class="switch">
-                  <input type="checkbox" id="smoothToggle">
-                  <span class="slider"></span>
-                </label>
-                <div class="switch-label">Smooth</div>
+            <!-- ─── Smooth ─── -->
+            <div class="col-md-4">
+              <div class="card shadow-sm h-100">
+                <div class="card-body text-center py-4">
+                  <label class="switch">
+                    <input type="checkbox" id="smoothToggle">
+                    <span class="slider"></span>
+                  </label>
+                  <div class="switch-label">Smooth</div>
+                </div>
               </div>
             </div>
           </div>
-
-          <!-- Smooth Mode -->
-          <!-- <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="smoothMode" />
-            <label class="form-check-label" for="smoothMode">
-              Smooth (Mean) Mode
-            </label>
-          </div> -->
-
         </div>
       </div>
     </div>
-
-    <!-- <div>Teachable Machine Pose Model</div> -->
-    <!-- <button type='button' onclick='init()'>Start</button> -->
-
-    <!-- <div id='label-container'></div> -->
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
@@ -124,5 +116,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="assets/main.js"></script>
     <script src="assets/set_speed_percent.js"></script>
+    <script src="assets/arrow.js"></script>
   </body>
 </html>

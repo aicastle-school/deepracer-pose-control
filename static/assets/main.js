@@ -5,8 +5,12 @@
 const URL = "./";
 let model, webcam, ctx, labelContainer, maxPredictions;
 let predictionChart;
-let apiInterval = 10000; // API 호출 간격 (ms)
+let apiInterval = 50// API 호출 간격 (ms)
 let lastLogTime = 0; // 마지막으로 로그를 찍은 시간 기록
+
+// Add event listener for the Stop button
+const stopToggle = document.getElementById("stopToggle");
+
 const poseToDriveCommand = {
   NONE: { angle: 0.0, speed: 0.0 }, // 정지            0.3
   "Fast-Forward": { angle: 0.0, speed: 4.0 }, // 빠른 직진        0.1
@@ -116,21 +120,33 @@ async function predict() {
     const useMean = smoothModeCheckbox.checked;
     console.log("스무스 true/false 확인 " + useMean)
 
+    const currentAngle = useMean ? meanAngle : topAngle;
+    const currentSpeed = useMean ? meanSpeed : topSpeed;
+
+    document.getElementById("currentSpeed").textContent = currentSpeed.toFixed(2) + " m/s";
+    document.getElementById("currentAngle").textContent = currentAngle.toFixed(1) + "°";
+
+    // 🚀 화살표 실시간 갱신
+    drawArrow(currentAngle, currentSpeed);
+
     const data = useMean ? { angle: meanAngle, speed: meanSpeed } : { angle: topAngle, speed: topSpeed };
     console.log("🚀 Sending data in mode:", useMean ? "Smooth (Mean)" : "Top");
     console.log("Data:", data);
 
-    fetch("/move", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(data),
-    })
-      .then((res) => res.text()) // Handle response
-      .then((text) => {
-        console.log("✅ Server response:", text);
+    if(!stopToggle.checked){
+      //console.log("스탑체크되있지않을때만 보내기")
+      fetch("/move", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(data),
       })
-      .catch((err) => console.error("❌ Error:", err));
+        .then((res) => res.text()) // Handle response
+        .then((text) => {
+          console.log("✅ Server response:", text);
+        })
+        .catch((err) => console.error("❌ Error:", err));
+      }
   }
 }
 
@@ -227,14 +243,11 @@ function updateProgressBars(predictionMap) {
   predictionChart.update();
 }
 
-// Add event listener for the Stop button
-const stopToggle = document.getElementById("stopToggle");
-
 stopToggle.addEventListener("change", () => {
+
+  //stop 체크박스가 on 이 아닐때만 move 실행
   const isChecked = stopToggle.checked;
   //console.log(isChecked)
-
-  //트루일때
   if(isChecked){
     fetch("/stop", {
       method: "PUT",
