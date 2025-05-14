@@ -1,38 +1,35 @@
 # deepracer-pose-control
 
 ## Install
+```bash
+pip install -r requirements.txt
+```
 
-- Python version: `3.12`
-- venv
-    ```bash
-    python -m venv venv
-    source venv/Scripts/activate
-    ```
+## Setup `.env`
+- `VEHICLE_IP`: IP address of the vehicle. (ex: `192.168.1.2`)
+- `VEHICLE_PASSWORD`: Password of the vehicle console. (ex: `etbsjmR6`)
+- `SSH_PASSWORD`: Password of the vehicle SSH.
+  > enable SSH access in the DeepRacer Vehicle Console and set a password in advance. 
+- `PORT`: Port for Webserver (default: `5000`)
+- `IMAGE_WIDTH`: Width of the image. (default: `320`)
+- `IMAGE_HEIGHT`: Height of the image. (default: `240`)
 
-- install
-    ```bash
-    pip install -r requirements.txt
-    ```
+
+## Init
+```bash
+python init.py
+```
+- Modify the `vehicle_control.py` file on the DeepRacer vehicle.
+- The default API allows only discrete steering‑angle and speed commands based on threshold values; update it so that continuous angle and speed inputs are accepted.
+
 
 ## Run
+```bash
+python run.py
+```
 
-- common
-    ```bash
-    python run.py
-    ```
+## Go to the Pose Control Page
+- <http://localhost:5000/>
+- <http://127.0.0.1:5000/>
 
-- Linux
-    ```bash
-    gunicorn --certfile=cert.pem --keyfile=key.pem --bind 0.0.0.0:5000 --worker-class=gevent --threads 4 run:app
-    ```
-
-- Window
-    ```bash
-    waitress-serve --host=0.0.0.0 --port=5000 run:app
-    ```
-
-## Etc
-    - 인증서 생성
-    ```bash
-    openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 36500 -nodes
-    ```
+> If you are using a different port, change the port in the URL.

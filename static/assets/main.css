@@ -25,7 +25,7 @@ border-radius: 4px;
 /* 속도조절 바 관련 UI 스타일 */
 
 .speed-control-card {
-    background-color: #fff;
+    background-color: rgb(255, 255, 255);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     padding: 20px;
@@ -85,14 +85,14 @@ border-radius: 4px;
     cursor: pointer;
     top: 0; left: 0;
     right: 0; bottom: 0;
-    background-color: #28a745; /* ✅ 기본: 초록색 (Stop OFF 상태) */
+    background-color: #9a9a9a; /* ✅ 기본: 초록색 (Stop OFF 상태) */
     transition: .4s;
     border-radius: 34px;
   }
 
   .slider:before {
     position: absolute;
-    content: "🛑";
+    content: "";
     height: 26px;
     width: 26px;
     left: 4px;
@@ -111,7 +111,7 @@ border-radius: 4px;
 
   input:checked + .slider:before {
     transform: translateX(26px);
-    content: "✅";
+    content: "";
   }
 
   .switch-label {
@@ -130,11 +130,11 @@ border-radius: 4px;
   }
 
   #smoothToggle + .slider:before {
-    content: "🌫️";
+    content: "";
   }
 
   #smoothToggle:checked + .slider:before {
-    content: "🌊";
+    content: "";
     transform: translateX(26px);
   }
 
