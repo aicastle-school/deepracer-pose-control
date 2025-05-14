@@ -5,7 +5,7 @@
 const URL = "./";
 let model, webcam, ctx, labelContainer, maxPredictions;
 let predictionChart;
-let apiInterval = 50// API 호출 간격 (ms)
+let apiInterval = 100// API 호출 간격 (ms)
 let lastLogTime = 0; // 마지막으로 로그를 찍은 시간 기록
 
 // Add event listener for the Stop button
