@@ -12,13 +12,10 @@ let lastLogTime = 0; // 마지막으로 로그를 찍은 시간 기록
 const stopToggle = document.getElementById("stopToggle");
 
 const poseToDriveCommand = {
-  NONE: { angle: 0.0, speed: 0.0 }, // 정지            0.3
-  "Fast-Forward": { angle: 0.0, speed: 4.0 }, // 빠른 직진        0.1
-  "Slow-Forward": { angle: 0.0, speed: 2.0 }, // 느린 직진        0.2
-  "Fast-Left": { angle: 30, speed: 4.0 }, // 빠른 좌회전      0.1
-  "Slow-Left": { angle: 30, speed: 2.0 }, // 느린 좌회전      0.3
-  "Fast-Right": { angle: -30, speed: 4.0 }, // 빠른 우회전      0
-  "Slow-Right": { angle: -30, speed: 2.0 }, // 느린 우회전      0
+  NONE: { angle: 0.0, speed: 0.0 },
+  "Forward": { angle: 0.0, speed: 3.0 },
+  "Left": { angle: 30, speed: 3.0 },
+  "Right": { angle: -30, speed: 3.0 },
 };
 
 //바로 시작
@@ -94,6 +91,10 @@ async function predict() {
 
     for (const predictionItem of prediction) {
       const { className, probability } = predictionItem;
+      
+      // NONE 클래스는 평균 계산에서 제외
+      if (className === "NONE") continue;
+      
       const { angle, speed } = poseToDriveCommand[className] || {
         angle: 0,
         speed: 0,
@@ -104,21 +105,23 @@ async function predict() {
       weightedSpeedSum += speed * probability;
     }
 
-    const meanAngle =
-      totalProbability > 0 ? weightedAngleSum / totalProbability : 0;
-    const meanSpeed =
-      totalProbability > 0 ? weightedSpeedSum / totalProbability : 0;
+    // NONE이 가장 높은 확률이면 평균값도 0으로 설정
+    const noneProb = predictionMap["NONE"] || 0;
+    const isNoneDominant = noneProb > 0.5; // NONE이 50% 이상이면
+    
+    const meanAngle = (totalProbability > 0 && !isNoneDominant) ? weightedAngleSum / totalProbability : 0;
+    const meanSpeed = (totalProbability > 0 && !isNoneDominant) ? weightedSpeedSum / totalProbability : 0;
 
-    console.log("평균값");
-    console.log(`meanAngle: ${meanAngle}`);
-    console.log(`meanSpeed: ${meanSpeed}`);
+    // console.log("평균값");
+    // console.log(`meanAngle: ${meanAngle}`);
+    // console.log(`meanSpeed: ${meanSpeed}`);
 
     //////// Move ////////
     const smoothModeCheckbox = document.getElementById("smoothToggle");
     
     //check 값 확인
     const useMean = smoothModeCheckbox.checked;
-    console.log("스무스 true/false 확인 " + useMean)
+    // console.log("스무스 true/false 확인 " + useMean)
 
     const currentAngle = useMean ? meanAngle : topAngle;
     const currentSpeed = useMean ? meanSpeed : topSpeed;
@@ -130,8 +133,8 @@ async function predict() {
     drawArrow(currentAngle, currentSpeed);
 
     const data = useMean ? { angle: meanAngle, speed: meanSpeed } : { angle: topAngle, speed: topSpeed };
-    console.log("🚀 Sending data in mode:", useMean ? "Smooth (Mean)" : "Top");
-    console.log("Data:", data);
+    // console.log("🚀 Sending data in mode:", useMean ? "Smooth (Mean)" : "Top");
+    // console.log("Data:", data);
 
     if(!stopToggle.checked){
       //console.log("스탑체크되있지않을때만 보내기")
@@ -143,9 +146,11 @@ async function predict() {
       })
         .then((res) => res.text()) // Handle response
         .then((text) => {
-          console.log("✅ Server response:", text);
+          // console.log("✅ Server response:", text);
         })
-        .catch((err) => console.error("❌ Error:", err));
+        .catch((err) => {
+          // console.error("❌ Error:", err)
+        });
       }
   }
 }
@@ -168,25 +173,19 @@ function initCharts() {
     data: {
       labels: [
         "NONE",
-        "Fast-Forward",
-        "Slow-Forward",
-        "Fast-Left",
-        "Slow-Left",
-        "Fast-Right",
-        "Slow-Right",
+        "Forward",
+        "Left",
+        "Right",
       ],
       datasets: [
         {
           label: "예측 확률 (%)",
-          data: [0, 0, 0, 0, 0, 0],
+          data: [0, 0, 0, 0], // 초기값은 모두 0%
           backgroundColor: [
             "#6c757d", // NONE (회색)
-            "#ffc107", // 빠른 직진 (노랑)
-            "#fce18f", // 느린 직진 (연노랑)
-            "#ff0019", // 빠른 좌회전 (빨강)
-            "#f97a87", // 느린 좌회전 (연빨강)
-            "#007bff", // 빠른 우회전 (파랑)
-            "#69a7e8", // 느린 우회전 (연파랑)
+            "#ff0019", // 직진 (빨강)
+            "#28a745", // 좌회전 (초록)
+            "#007bff", // 우회전 (파랑)
           ],
           borderRadius: 8, // 모서리 둥글게
           barThickness: 20, // 막대 두께
@@ -229,12 +228,9 @@ function initCharts() {
 function updateProgressBars(predictionMap) {
   const labels = [
     "NONE",
-    "Fast-Forward",
-    "Slow-Forward",
-    "Fast-Left",
-    "Slow-Left",
-    "Fast-Right",
-    "Slow-Right",
+    "Forward",
+    "Left",
+    "Right",
   ];
   const updatedData = labels.map((label) =>
     Math.round((predictionMap[label] || 0) * 100)
@@ -244,7 +240,6 @@ function updateProgressBars(predictionMap) {
 }
 
 stopToggle.addEventListener("change", () => {
-
   //stop 체크박스가 on 이 아닐때만 move 실행
   const isChecked = stopToggle.checked;
   //console.log(isChecked)
@@ -256,8 +251,63 @@ stopToggle.addEventListener("change", () => {
     })
     .then((res) => res.text())
     .then((text) => {
-      console.log("✅ Stop command sent successfully:", text);
+      // console.log("✅ Stop command sent successfully:", text);
     })
-    .catch((err) => console.error("❌ Error sending stop command:", err));
+    .catch((err) => {
+      // console.error("❌ Error sending stop command:", err)
+    });
+  }
+});
+
+// 키보드 화살표 키로 스피드 조절
+document.addEventListener("keydown", (event) => {
+  const speedRange = document.getElementById("speedRange");
+  const speedValue = document.getElementById("speedValue");
+  const smoothToggle = document.getElementById("smoothToggle");
+  
+  if (event.key === "+") {
+    event.preventDefault();
+    let currentSpeed = parseInt(speedRange.value);
+    if (currentSpeed < 100) {
+      currentSpeed += 1;
+      speedRange.value = currentSpeed;
+      speedValue.textContent = currentSpeed + "%";
+      
+      // 스피드 변경 API 호출
+      fetch("/speed_percent", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ speed_percent: currentSpeed }),
+      });
+    }
+  } else if (event.key === "-") {
+    event.preventDefault();
+    let currentSpeed = parseInt(speedRange.value);
+    if (currentSpeed > 1) {
+      currentSpeed -= 1;
+      speedRange.value = currentSpeed;
+      speedValue.textContent = currentSpeed + "%";
+      
+      // 스피드 변경 API 호출
+      fetch("/speed_percent", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ speed_percent: currentSpeed }),
+      });
+    }
+  } else if (event.key === "Enter") {
+    event.preventDefault();
+    // Stop 버튼 토글
+    stopToggle.checked = !stopToggle.checked;
+    
+    // Stop 이벤트 수동 트리거 (변수명 변경)
+    const changeEvent = new Event('change');
+    stopToggle.dispatchEvent(changeEvent);
+  } else if (event.key === " ") {
+    event.preventDefault();
+    // Smooth 모드 토글
+    smoothToggle.checked = !smoothToggle.checked;
   }
 });

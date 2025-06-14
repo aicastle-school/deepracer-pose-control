@@ -5,7 +5,7 @@ from flask import (
     Response,
     stream_with_context,
     copy_current_request_context,
-    # send_from_directory,
+    send_from_directory,
     # redirect,
     # url_for,
 )
@@ -59,7 +59,8 @@ def video_stream():
 
         return Response(stream_with_context(generate_frames()), mimetype='multipart/x-mixed-replace; boundary=frame')
     else:
-        return "Vehicle not connected", 500
+        # Return static road.jpg image when vehicle is not connected
+        return send_from_directory('static', 'road.jpg')
 
 @app.put('/speed_percent')
 def set_speed_percent():
