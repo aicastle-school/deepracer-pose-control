@@ -59,8 +59,8 @@ def video_stream():
 
         return Response(stream_with_context(generate_frames()), mimetype='multipart/x-mixed-replace; boundary=frame')
     else:
-        # Return static road.jpg image when vehicle is not connected
-        return send_from_directory('static', 'road.jpg')
+        # Return static test_image.jpg image when vehicle is not connected
+        return send_from_directory('static', 'test_image.jpg')
 
 @app.put('/speed_percent')
 def set_speed_percent():
