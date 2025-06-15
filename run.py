@@ -47,7 +47,7 @@ def index():
     return render_template("index.html")
 
 if vehicle:
-    @app.route('/video')
+    @app.route('/video.jpg')
     def video_stream():
         @copy_current_request_context
         def generate_frames():
