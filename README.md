@@ -37,16 +37,14 @@ pip install -r requirements.txt
 ```bash
 python init.py
 ```
-- Modify the `vehicle_control.py` file on the DeepRacer vehicle.
-- The default API allows only discrete steering‑angle and speed commands based on threshold values; update it so that continuous angle and speed inputs are accepted.
+> The default API allows only discrete steering‑angle and speed commands based on threshold values; update it so that continuous angle and speed inputs are accepted.
 
 
 ## Run
 ```bash
 python run.py
 ```
-
-## Go to the Pose Control Page
+This will start a web server on the specified port and open the web interface in your default browser.
 - <http://localhost:5000/>
 - <http://127.0.0.1:5000/>
 
