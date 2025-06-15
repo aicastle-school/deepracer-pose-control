@@ -18,6 +18,7 @@ import signal
 signal.signal(signal.SIGINT, lambda sig, frame: os._exit(0))
 
 
+
 from aicastle.deepracer.vehicle.api.client import VehicleClient
 try:
     vehicle =VehicleClient(
@@ -35,8 +36,8 @@ except Exception as e:
 ##################### app #####################
 app = Flask(
     __name__,
-    template_folder=os.path.expanduser("templates"),
-    static_folder=os.path.expanduser("static"),
+    template_folder=os.path.expanduser("."),
+    static_folder=os.path.expanduser("."),
     static_url_path="/",
 )
 
@@ -45,9 +46,9 @@ app = Flask(
 def index():
     return render_template("index.html")
 
-@app.route('/video')
-def video_stream():
-    if vehicle:
+if vehicle:
+    @app.route('/video')
+    def video_stream():
         @copy_current_request_context
         def generate_frames():
             while True:
@@ -58,49 +59,45 @@ def video_stream():
                         b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
 
         return Response(stream_with_context(generate_frames()), mimetype='multipart/x-mixed-replace; boundary=frame')
-    else:
-        # Return static test_image.jpg image when vehicle is not connected
-        return send_from_directory('static', 'test_image.jpg')
 
-@app.put('/speed_percent')
-def set_speed_percent():
-    if not (data := request.get_json(silent=True)):
-        return {"error": "No JSON data provided"}, 400
-    print(f"/speed_percent: {data}")
-    
-    if vehicle:
-        speed_percent = int(data.get("speed_percent"))
-        vehicle.set_speed_percent(speed_percent)
-        return {"message": "Speed updated successfully", "speed_percent": speed_percent}, 200
-    else:
-        return {"error": "Vehicle not connected"}, 500
+    @app.put('/speed_percent')
+    def set_speed_percent():
+        if not (data := request.get_json(silent=True)):
+            return {"error": "No JSON data provided"}, 400
+        print(f"/speed_percent: {data}")
+        
+        if vehicle:
+            speed_percent = int(data.get("speed_percent"))
+            vehicle.set_speed_percent(speed_percent)
+            return {"message": "Speed updated successfully", "speed_percent": speed_percent}, 200
+        else:
+            return {"error": "Vehicle not connected"}, 500
 
-@app.put("/move")
-def move():
-    if not (data := request.get_json(silent=True)):
-        return {"error": "No JSON data provided"}, 400
-    print(f"/move: {data}")
-    if vehicle:
-        vehicle.move(
-            angle=float(data.get("angle")), 
-            speed=float(data.get("speed"))
-        )
-        return {"message": "Data updated successfully", "data": data}, 200
-    else:
-        return {"error": "Vehicle not connected"}, 500
+    @app.put("/move")
+    def move():
+        if not (data := request.get_json(silent=True)):
+            return {"error": "No JSON data provided"}, 400
+        print(f"/move: {data}")
+        if vehicle:
+            vehicle.move(
+                angle=float(data.get("angle")), 
+                speed=float(data.get("speed"))
+            )
+            return {"message": "Data updated successfully", "data": data}, 200
+        else:
+            return {"error": "Vehicle not connected"}, 500
 
-@app.put("/stop")
-def stop():
-    print("/stop")
-    if vehicle:
-        vehicle.stop()
-        return {"message": "Vehicle stopped successfully"}, 200
-    else:
-        return {"error": "Vehicle not connected"}, 500
+    @app.put("/stop")
+    def stop():
+        print("/stop")
+        if vehicle:
+            vehicle.stop()
+            return {"message": "Vehicle stopped successfully"}, 200
+        else:
+            return {"error": "Vehicle not connected"}, 500
 
-@app.route('/favicon.ico')
-def favicon():
-    return '', 204
+else:
+    print("Vehicle not connected, skipping video stream and control routes.")
 
 ######### run ###########
 app.config.update(
