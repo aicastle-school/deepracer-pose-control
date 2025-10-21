@@ -1,0 +1,69 @@
+#
+# Default server configuration
+#
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+    return 302 https://$http_host;
+}
+
+server {
+    listen 443 ssl http2 default_server;
+    listen [::]:443 ssl http2 default_server;
+    include snippets/self-signed.conf;
+
+    root /opt/aws/deepracer/lib/device_console/;
+    server_name webserver;
+
+    # CORS headers for all locations
+    add_header 'Access-Control-Allow-Origin' '*' always;
+    add_header 'Access-Control-Allow-Methods' 'GET, PUT, POST, OPTIONS, DELETE' always;
+    add_header 'Access-Control-Allow-Headers' 'Origin, X-Requested-With, Content-Type, Accept, Authorization' always;
+
+    location /static/ {
+        expires 1M;
+        allow all;
+    }
+
+    location = /favicon.ico {
+        log_not_found off;
+    }
+
+    location /login {
+        auth_request_set $user $upstream_http_x_forwarded_user;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-User $user;
+        proxy_pass http://0.0.0.0:5001/login;
+    }
+
+    location /route {
+        proxy_pass http://127.0.0.1:8080/stream;
+    }
+
+    location / {
+        auth_request_set $user $upstream_http_x_forwarded_user;
+        proxy_set_header X-Forwarded-User $user;
+        proxy_pass http://0.0.0.0:5001/;
+
+        proxy_set_header Connection '';
+        proxy_http_version 1.1;
+        chunked_transfer_encoding off;
+        proxy_buffering off;
+        proxy_cache off;
+
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Real-IP $remote_addr;
+        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Host $server_name;
+        proxy_redirect     off;
+    }
+
+    location /auth {
+        internal;
+        proxy_pass_request_body off;
+        proxy_set_header Host $host;
+        proxy_set_header Content-Length "";
+        proxy_pass http://0.0.0.0:5001/auth;
+    }
+}
