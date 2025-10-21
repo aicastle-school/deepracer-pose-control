@@ -77,7 +77,12 @@ function updateVideoURL() {
 document.addEventListener("DOMContentLoaded", () => {
   const ipInput = document.getElementById("ipAddress");
   if (ipInput) {
-    // 입력값 변경 시 비디오 URL 업데이트
+    // 셀렉트박스 변경 시 비디오 URL 업데이트
+    ipInput.addEventListener("change", () => {
+      updateVideoURL();
+      checkIPAndToggleStop();
+    });
+    // 입력값 변경 시에도 처리 (기존 input 타입 호환)
     ipInput.addEventListener("input", () => {
       updateVideoURL();
       checkIPAndToggleStop();
