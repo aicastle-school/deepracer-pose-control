@@ -2,7 +2,6 @@
 // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/pose
 
 // the link to your model provided by Teachable Machine export panel
-const URL = "./";
 let model, webcam, ctx, labelContainer, maxPredictions;
 let predictionChart;
 let apiInterval = 100// API 호출 간격 (ms)
