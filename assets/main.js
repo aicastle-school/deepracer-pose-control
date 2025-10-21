@@ -309,7 +309,8 @@ init();
 async function init() {
   // load the model and metadata
   // Refer to tmPose.loadFromFiles() in the API to support files from a file picker
-  model = await tmPose.load("/model.json", "/metadata.json");
+  // Use relative URL (URL variable) so GH Pages or nested hosting fetches from repo path
+  model = await tmPose.load("./model.json", "./metadata.json");
   maxPredictions = model.getTotalClasses();
 
   // Convenience function to setup a webcam
