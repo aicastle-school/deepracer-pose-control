@@ -11,8 +11,8 @@ let lastLogTime = 0; // 마지막으로 로그를 찍은 시간 기록
 window.maxSpeed = 0.5;
 
 // 배터리에 따른 속도 설정 (관리용)
-const SPEED_AT_FULL_BATTERY = 2.5;  // 배터리 100%일 때 속도
-const SPEED_AT_EMPTY_BATTERY = Math.min(SPEED_AT_FULL_BATTERY + 0.5, 4.0); // 배터리 0%일 때 속도 (최대 4.0)
+const SPEED_AT_FULL_BATTERY = 2.7;  // 배터리 100%일 때 속도
+const SPEED_AT_EMPTY_BATTERY = Math.min(SPEED_AT_FULL_BATTERY + 0.3, 4.0); // 배터리 0%일 때 속도 (최대 4.0)
 
 // Add event listener for the Stop button
 const stopToggle = document.getElementById("stopToggle");
