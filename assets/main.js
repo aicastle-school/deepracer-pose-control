@@ -8,11 +8,11 @@ let apiInterval = 100// API 호출 간격 (ms)
 let lastLogTime = 0; // 마지막으로 로그를 찍은 시간 기록
 
 // 최대 속도를 전역 변수로 설정 (0.0 ~ 1.0), 초기값 50%
-window.maxSpeed = 0.3;
+window.maxSpeed = 0.5;
 
 // 배터리에 따른 속도 설정 (관리용)
-const SPEED_AT_FULL_BATTERY = 2.7;  // 배터리 100%일 때 속도
-const SPEED_AT_EMPTY_BATTERY = Math.min(SPEED_AT_FULL_BATTERY + 1, 4.0); // 배터리 0%일 때 속도 (최대 4.0)
+const SPEED_AT_FULL_BATTERY = 2.5;  // 배터리 100%일 때 속도
+const SPEED_AT_EMPTY_BATTERY = Math.min(SPEED_AT_FULL_BATTERY + 0.5, 4.0); // 배터리 0%일 때 속도 (최대 4.0)
 
 // Add event listener for the Stop button
 const stopToggle = document.getElementById("stopToggle");
